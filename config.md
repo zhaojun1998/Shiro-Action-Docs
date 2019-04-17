@@ -35,6 +35,8 @@ security.login.verify=false
 security.retry.count=5
 ```
 
+实现类为 `im.zhaojun.shiro.credential.RetryLimitHashedCredentialsMatcher`
+
 ## 登录日志
 
 配置是否记录登录日志，一般开发环境关闭，生产环境开启。关闭后首页的 `近七天登录次数统计图` 也不会再更新。
@@ -43,10 +45,40 @@ security.retry.count=5
 log.login = false
 ```
 
+登录日志使用 `AOP` 实现，在用户登录后，会记录一条登录日志，代码地址如下：
+
+im.zhaojun.aop.LoginLogAspect.java
+
+```java
+@After("loginLogPointCut()")
+public void recordLoginLog(JoinPoint joinPoint) {
+    // 获取登陆参数
+    Object[] args = joinPoint.getArgs();
+    User user = (User) args[0];
+
+    Subject subject = SecurityUtils.getSubject();
+
+    String ip = IPUtils.getIpAddr();
+    loginLogService.addLog(user.getUsername(), subject.isAuthenticated(), ip);
+}
+```
+
 ## 操作日志
 
 配置是否记录操作日志，一般开发环境关闭，生产环境开启。
 
 ```properties
 log.operation = false
+```
+
+操作日志使用 `AOP` 实现，使用方式为在对应的方法上加上 @OperationLog 注解，如：
+
+```java
+@OperationLog("新增部门")
+@PostMapping
+@ResponseBody
+public ResultBean add(Dept dept) {
+    deptService.insert(dept);
+    return ResultBean.success();
+}
 ```

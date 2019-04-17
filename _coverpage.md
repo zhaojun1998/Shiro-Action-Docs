@@ -1,5 +1,3 @@
-![logo](_media/icon.svg)
-
 # Shiro Action
 
 > 一个基于 Shiro 的权限管理系统

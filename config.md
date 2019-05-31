@@ -82,3 +82,23 @@ public ResultBean add(Dept dept) {
     return ResultBean.success();
 }
 ```
+
+## OAuth2 登录
+
+使用 OAuth2 登录需要配置, `clientId`, `clientSecret` 和 `redirectUrl`, 如:
+
+```properties
+shiro-action.oauth2.provider.github.clientId=your github oauth2 clientId
+shiro-action.oauth2.provider.github.clientSecret=your github oauth2 clientSecret
+shiro-action.oauth2.provider.github.redirectUrl=http://localhost:8080/oauth2/callback/github
+
+shiro-action.oauth2.provider.gitee.clientId=your gitee oauth2 clientId
+shiro-action.oauth2.provider.gitee.clientSecret=your gitee oauth2 clientSecret
+shiro-action.oauth2.provider.gitee.redirectUrl=http://localhost:8080/oauth2/callback/gitee
+```
+
+其中 `shiro-action.oauth2.provider` 后的如 `github`, `gitee` 这些指服务提供商, 这些指只能取值于 `im.zhaojun.common.constants.AuthcTypeEnum` 枚举类中的值, 当你添加了其他 OAuth2 服务提供商后, 需要先在这个枚举类中添加一个枚举项.
+
+* `clientId`: 不可为空, 从 OAuth2 服务提供商申请得到.
+* `clientSecret`: 不可为空, 从 OAuth2 服务提供商申请得到.
+* `redirectUrl`: 回调地址, 不可重复, 且必须与在 OAuth2 服务器中填写的回调地址一致.

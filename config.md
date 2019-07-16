@@ -13,7 +13,7 @@
 对于权限系统，一般都有一个**超级管理员**用来分配权限，做一些系统的初始化工作，配置方式为：
 
 ```properties
-security.super-admin.username=admin
+shiro-action.super-admin-username=admin
 ```
 
 > 可在相应的 dev 和 prod 环境中配置不同的超级管理员，如不配置，默认值为 `admin`。
@@ -32,17 +32,28 @@ security.login.verify=false
 配置在 10 分钟内登录失败次数限制，默认值为 `5` 次。
 
 ```properties
-security.retry.count=5
+shiro-action.retry-count=5
 ```
 
 实现类为 `im.zhaojun.shiro.credential.RetryLimitHashedCredentialsMatcher`
+
+
+## 登录失败账号锁定时间
+
+当超出 `shiro-action.retry-count` 指定的值后, 账号会被锁定一段时间, 配置方式如下:
+
+```properties
+shiro-action.retry-timeout = 300
+```
+
+> 默认值 `300`， 单位为秒.
 
 ## 登录日志
 
 配置是否记录登录日志，一般开发环境关闭，生产环境开启。关闭后首页的 `近七天登录次数统计图` 也不会再更新。
 
 ```properties
-log.login = false
+shiro-action.log.login = false
 ```
 
 登录日志使用 `AOP` 实现，在用户登录后，会记录一条登录日志，代码地址如下：
@@ -68,7 +79,7 @@ public void recordLoginLog(JoinPoint joinPoint) {
 配置是否记录操作日志，一般开发环境关闭，生产环境开启。
 
 ```properties
-log.operation = false
+shiro-action.log.operation = false
 ```
 
 操作日志使用 `AOP` 实现，使用方式为在对应的方法上加上 @OperationLog 注解，如：
@@ -88,17 +99,17 @@ public ResultBean add(Dept dept) {
 使用 OAuth2 登录需要配置, `clientId`, `clientSecret` 和 `redirectUrl`, 如:
 
 ```properties
-shiro-action.oauth2.provider.github.clientId=your github oauth2 clientId
-shiro-action.oauth2.provider.github.clientSecret=your github oauth2 clientSecret
-shiro-action.oauth2.provider.github.redirectUrl=http://localhost:8080/oauth2/callback/github
+shiro-action.oauth2-provider.github.clientId=your github oauth2 clientId
+shiro-action.oauth2-provider.github.clientSecret=your github oauth2 clientSecret
+shiro-action.oauth2-provider.github.redirectUrl=http://localhost:8080/oauth2/callback/github
 
-shiro-action.oauth2.provider.gitee.clientId=your gitee oauth2 clientId
-shiro-action.oauth2.provider.gitee.clientSecret=your gitee oauth2 clientSecret
-shiro-action.oauth2.provider.gitee.redirectUrl=http://localhost:8080/oauth2/callback/gitee
+shiro-action.oauth2-provider.gitee.clientId=your gitee oauth2 clientId
+shiro-action.oauth2-provider.gitee.clientSecret=your gitee oauth2 clientSecret
+shiro-action.oauth2-provider.gitee.redirectUrl=http://localhost:8080/oauth2/callback/gitee
 ```
 
-其中 `shiro-action.oauth2.provider` 后的如 `github`, `gitee` 这些指服务提供商, 这些指只能取值于 `im.zhaojun.common.constants.AuthcTypeEnum` 枚举类中的值, 当你添加了其他 OAuth2 服务提供商后, 需要先在这个枚举类中添加一个枚举项.
+其中 `shiro-action.oauth2-provider` 后的如 `github`, `gitee` 这些指服务提供商, 这些指只能取值于 `im.zhaojun.common.constants.AuthcTypeEnum` 枚举类中的值, 当你添加了其他 OAuth2 服务提供商后, 需要先在这个枚举类中添加一个枚举项.
 
 * `clientId`: 不可为空, 从 OAuth2 服务提供商申请得到.
 * `clientSecret`: 不可为空, 从 OAuth2 服务提供商申请得到.
-* `redirectUrl`: 回调地址, 不可重复, 且必须与在 OAuth2 服务器中填写的回调地址一致.
+* `redirectUrl`: 回调地址, 不可重复, 且必须与在 OAuth2 服务器中填写的回调地址一致, 需要注意如 localhost 和 127.0.0.1 并不是同一个地址.
